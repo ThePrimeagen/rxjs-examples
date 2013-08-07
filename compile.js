@@ -16,6 +16,8 @@ module.exports = function(debug, srcPath, externals, out) {
                 if (!err) {
                     var bundlePath = path.join(out, 'bundle.js');
                     var htmlPath = path.join(out, 'index.html');
+
+                    console.log("Writing Bundle: " + bundlePath + " : Html to: " + htmlPath);
                     fs.writeFile(bundlePath, src, function(err) {
                         if (err) {
                             console.log('Error JS(' + srcPath + '): ' + err);
