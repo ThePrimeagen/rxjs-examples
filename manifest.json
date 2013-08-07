@@ -1,0 +1,5 @@
+{
+    "modules": {
+        "intro_observables": "./observables/click_me/"
+    }
+}
