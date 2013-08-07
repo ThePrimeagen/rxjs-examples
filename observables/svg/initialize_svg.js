@@ -12,8 +12,8 @@ module.exports = function(width, height) {
         .attr('height', height + rectHeight * 2);
 
     for (var i = 0; i < 10; i++) {
-        var x = Math.round(50 + Math.random() * height - rectWidth);
-        var y = Math.round(50 + Math.random() * width - rectHeight);
+        var x = Math.round(rectWidth * 2 + Math.random() * height - rectWidth);
+        var y = Math.round(rectHeight * 2 + Math.random() * width - rectHeight);
 
         svg.append('rect')
             .attr('x', x)

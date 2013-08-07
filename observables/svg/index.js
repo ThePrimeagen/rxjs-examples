@@ -1,5 +1,6 @@
 var $ = require('jquery');
 var Rx = require('rx');
+var RxBindings = require('rxjs-bindings');
 var initSvg = require('./initialize_svg');
 var d3 = require('d3');
 
@@ -21,37 +22,25 @@ $(function() {
         return function() {
             $svg.off('click');
         }
-    });
+    }).publish();
 
     // --------------------------------------------
     //  The set of observables that observe the click observable and will
     // fire off events if the filter is met
     // --------------------------------------------
 
-    // Filtering based on id
-    var id03Observable = Rx.Observable.concat(clickObservable)
-        .select(function(target) {
-            return target;
-        })
+    var id03Observable = clickObservable
         .filter(function(target) {
             return parseInt(target.id) < 3;
         });
 
-    // Filtering based on id
-    var id37Observable = Rx.Observable.concat(clickObservable)
-        .select(function(target) {
-            return target;
-        })
+    var id37Observable = clickObservable
         .filter(function(target) {
             var id = parseInt(target.id);
             return id >= 3 && id < 7;
         });
 
-    // Filtering based on id
-    var id710Observable = Rx.Observable.concat(clickObservable)
-        .select(function(target) {
-            return target;
-        })
+    var id710Observable = clickObservable
         .filter(function(target) {
             var id = parseInt(target.id);
             return id >= 7 && id < 10;
@@ -110,4 +99,6 @@ $(function() {
             $target.data('active', true);
         }
     });
+
+    clickObservable.connect();
 });
