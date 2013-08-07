@@ -1,5 +1,6 @@
 {
     "modules": {
-        "intro_observables": "./observables/click_me/"
+        "Click Me Observables": "./observables/click_me/",
+        "Basic Object Manipulation": "./observables/svg/"
     }
 }

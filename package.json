@@ -13,7 +13,9 @@
         "express": "*",
         "optimist": "*",
         "browserify": "*",
-        "mkpath": "*"
+        "mkpath": "*",
+        "lodash": "*",
+        "d3": "*"
     },
     "private": "true"
 }

@@ -9,6 +9,7 @@ var compile = require('./compile');
 var path = require('path');
 var debug = argv.env === 'dev';
 
+// TODO: Build a core file that is appended into the externals and is "required" in
 fs.readFile('./manifest.json', function(err, manifest) {
     var modules = JSON.parse(manifest).modules;
     for (var k in modules) {
