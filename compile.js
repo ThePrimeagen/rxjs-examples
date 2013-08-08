@@ -102,6 +102,8 @@ function browserifyExternals(b, externals) {
     b.require(externals + 'jquery.js', {expose: 'jquery'});
     b.require(externals + 'rx.js', {expose: 'rx'});
     b.require(externals + 'rx.binding.js', {expose: 'rxjs-bindings'});
+    b.require('d3', {expose: 'd3'});
+    b.require('lodash', {expose: 'lodash'});
 }
 
 /**
@@ -112,16 +114,8 @@ function excludeExternals(b, externals) {
     b.external(externals + 'jquery.js');
     b.external(externals + 'rx.js');
     b.external(externals + 'rx.binding.js');
-}
-
-/**
- * ignore all the externals
- * @param {Browserify} b
- */
-function ignoreExternals(b) {
-    b.ignore('jquery');
-    b.ignore('rx');
-    b.ignore('rxjs-bindings');
+    b.external('d3');
+    b.external('lodash');
 }
 
 /**
@@ -132,7 +126,7 @@ function getHtml() {
     return '<!DOCTYPE html>\n' +
         '<html>' +
             '<head>' +
-                '<script type="text/javascript" src="/examples/core.js"></script>>' +
+                '<script type="text/javascript" src="/examples/core.js"></script>' +
                 '<script type="text/javascript" src="bundle.js"></script>' +
             '</head>' +
             '<body></body>' +
