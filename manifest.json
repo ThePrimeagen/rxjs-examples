@@ -1,6 +1,6 @@
 {
     "modules": {
-        "Click Me Observables": "./observables/click_me/",
-        "Basic Object Manipulation": "./observables/svg/"
+        "Intro into Observables": "./observables/intro/",
+        "Rx.Observable.publish": "./observables/publish/"
     }
 }

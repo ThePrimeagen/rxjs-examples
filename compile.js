@@ -48,9 +48,9 @@ module.exports = {
                 displayName: k
             });
         }
-        fs.writeFile(exampleDir, _.template(getHtmlExamplePage(), {links: links}), function(err) {
+        fs.writeFile(exampleDir + 'index.html', _.template(getHtmlExamplePage(), {links: links}), function(err) {
             if (err) {
-                console.log('Error HTML(' + exampleDir + '/index.html): ' + err);
+                console.log('Error HTML(' + exampleDir + 'index.html): ' + err);
             }
         });
     }
