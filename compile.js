@@ -6,12 +6,53 @@ var _ = require('lodash');
 
 // TODO: Turn this into rx styled.  This is a pain
 module.exports = {
+    /**
+     * Builds the core compilation process.  This is where
+     * we build out the core library that is used in every
+     * bundle
+     * @param {Boolean} debug
+     * @param {String} externals
+     * @param {String} out
+     */
+    coreCompile: function(debug, externals, out) {
+        var b = browserify()
+            .add(externals + 'index.js');
+
+        // Adds the externals
+        browserifyExternals(b, externals);
+        b.bundle({debug: debug}, function(err, src) {
+            if (err) {
+                console.log("Error compiling core");
+            } else {
+
+                mkpath(out, function(err) {
+                    if (err) {
+                        console.log("Could not create path for bundles");
+                    } else {
+                        var bundlePath = path.join(out, 'core.js');
+
+                        console.log("Writing Core: " + bundlePath);
+                        fs.writeFile(bundlePath, src, function(err) {
+                            if (err) {
+                                console.log('Error JS(core): ' + err);
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    },
     compile: function(debug, srcPath, externals, out) {
+
         var b = browserify()
             .add(srcPath);
 
         // Adds the externals
         browserifyExternals(b, externals);
+
+        // TODO: Figure out how to exclude externals
+        excludeExternals(b, externals);
+
         b.bundle({debug: debug}, function(err, src) {
             if (!err) {
                 mkpath(out, function(err) {
@@ -64,13 +105,36 @@ function browserifyExternals(b, externals) {
 }
 
 /**
+ * Exclude all the externals
+ * @param {Browserify} b
+ */
+function excludeExternals(b, externals) {
+    b.external(externals + 'jquery.js');
+    b.external(externals + 'rx.js');
+    b.external(externals + 'rx.binding.js');
+}
+
+/**
+ * ignore all the externals
+ * @param {Browserify} b
+ */
+function ignoreExternals(b) {
+    b.ignore('jquery');
+    b.ignore('rx');
+    b.ignore('rxjs-bindings');
+}
+
+/**
  * Gets the html required for this build to display what happens
  * @param {String} bundlePath
  */
 function getHtml() {
     return '<!DOCTYPE html>\n' +
         '<html>' +
-            '<head><script type="text/javascript" src="bundle.js"></script></head>' +
+            '<head>' +
+                '<script type="text/javascript" src="/examples/core.js"></script>>' +
+                '<script type="text/javascript" src="bundle.js"></script>' +
+            '</head>' +
             '<body></body>' +
         '</html>';
 }
