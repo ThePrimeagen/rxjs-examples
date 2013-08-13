@@ -59,6 +59,7 @@ module.exports = {
                     if (!err) {
                         var bundlePath = path.join(out, 'bundle.js');
                         var htmlPath = path.join(out, 'index.html');
+                        var srcHtml = path.join(srcPath, 'index.html');
 
                         console.log("Writing Bundle: " + bundlePath + " : Html to: " + htmlPath);
                         fs.writeFile(bundlePath, src, function(err) {
@@ -66,9 +67,28 @@ module.exports = {
                                 console.log('Error JS(' + srcPath + '): ' + err);
                             }
                         });
-                        fs.writeFile(htmlPath, getHtml(), function(err) {
-                            if (err) {
-                                console.log('Error HTML(' + srcPath + '): ' + err);
+
+                        fs.exists(srcHtml, function(exists) {
+
+                            console.log("Writing Bundle: " + bundlePath + " : Html to: " + htmlPath);
+                            if (exists) {
+                                fs.readFile(srcHtml, function(err, html) {
+                                    if (err) {
+                                        console.log('Could not read source html: ' + srcHtml);
+                                    } else {
+                                        fs.writeFile(htmlPath, getHtml(html.toString()), function(err) {
+                                            if (err) {
+                                                console.log('Error HTML(' + srcPath + '): ' + err);
+                                            }
+                                        });
+                                    }
+                                });
+                            } else {
+                                fs.writeFile(htmlPath, getHtml(), function(err) {
+                                    if (err) {
+                                        console.log('Error HTML(' + srcPath + '): ' + err);
+                                    }
+                                });
                             }
                         });
                     }
@@ -122,15 +142,9 @@ function excludeExternals(b, externals) {
  * Gets the html required for this build to display what happens
  * @param {String} bundlePath
  */
-function getHtml() {
-    return '<!DOCTYPE html>\n' +
-        '<html>' +
-            '<head>' +
-                '<script type="text/javascript" src="/examples/core.js"></script>' +
-                '<script type="text/javascript" src="bundle.js"></script>' +
-            '</head>' +
-            '<body></body>' +
-        '</html>';
+function getHtml(html) {
+    html = html || '<!DOCTYPE html>\n<html><head><%= scripts %></head><body></body></html>';
+    return _.template(html, {scripts: getSources()});
 }
 
 /**
@@ -145,4 +159,13 @@ function getHtmlExamplePage() {
                 '<ul><%= links %></ul>'
             '</body>' +
         '</html>';
+}
+
+/**
+ * Gets the sources
+ * @returns {string}
+ */
+function getSources() {
+    return '<script type="text/javascript" src="/examples/core.js"></script>' +
+        '<script type="text/javascript" src="bundle.js"></script>';
 }

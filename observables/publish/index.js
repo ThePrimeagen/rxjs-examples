@@ -10,6 +10,9 @@ $(function() {
     initSvg();
 
     // Listens to all clicks and the filter will return the element of which is clicked.
+    // *****  This takes advantage of publish.  If publish was not used, this function would be called
+    // per observer listening. (thus binding n (which is 3) 'click' events to $svg)
+    // Using publish will alievate that problem
     var $svg = $('svg');
     var clickObservable = Rx.Observable.create(function(observer) {
         $svg.on('click', function(eventObj) {
@@ -48,6 +51,7 @@ $(function() {
 
     // ------------------------------------------------------
     //  The filtered observers
+    // * Its easy to mix different libraries with rxjs
     // ------------------------------------------------------
     id03Observable.subscribe(function(target) {
         var $target = $(target);
@@ -100,5 +104,7 @@ $(function() {
         }
     });
 
+    // For publish to work fully.  You must call "connect" on the published observer.
+    // This will cause events to start propagating
     clickObservable.connect();
 });
