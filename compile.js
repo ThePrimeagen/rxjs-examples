@@ -70,8 +70,8 @@ module.exports = {
 
                         fs.exists(srcHtml, function(exists) {
 
-                            console.log("Writing Bundle: " + bundlePath + " : Html to: " + htmlPath);
                             if (exists) {
+
                                 fs.readFile(srcHtml, function(err, html) {
                                     if (err) {
                                         console.log('Could not read source html: ' + srcHtml);
@@ -140,11 +140,14 @@ function excludeExternals(b, externals) {
 
 /**
  * Gets the html required for this build to display what happens
- * @param {String} bundlePath
+ * @param {String} html
+ * @param {Any} [options]
  */
-function getHtml(html) {
+function getHtml(html, options) {
+    options = options || {};
+    options.scripts = getSources();
     html = html || '<!DOCTYPE html>\n<html><head><%= scripts %></head><body></body></html>';
-    return _.template(html, {scripts: getSources()});
+    return _.template(html, options);
 }
 
 /**
@@ -167,5 +170,7 @@ function getHtmlExamplePage() {
  */
 function getSources() {
     return '<script type="text/javascript" src="/examples/core.js"></script>' +
-        '<script type="text/javascript" src="bundle.js"></script>';
+        '<script type="text/javascript" src="bundle.js"></script>' +
+        '<link rel="stylesheet" href="/examples/static/bootstrap/css/bootstrap.min.css">' +
+        '<link rel="stylesheet" href="/examples/static/bootstrap/css/bootstrap-responsive.min.css">';
 }
