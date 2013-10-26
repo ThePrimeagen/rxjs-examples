@@ -1,10 +1,10 @@
 {
-    "name": "Diagram",
+    "name": "rxjs-examples",
     "author": [
         "Michael Paulson <michael.b.paulson@gmail.com>"
     ],
-    "version": "0.0.2b",
-    "description": "ass kicking awesome",
+    "version": "0.0.5",
+    "description": "Hopefully a useful rxjs-example set.",
     "dependencies": {
         "rx": "*",
         "rxjs-jquery": "*",
@@ -15,7 +15,7 @@
         "browserify": "*",
         "mkpath": "*",
         "lodash": "*",
-        "d3": "*"
-    },
-    "private": "true"
+        "d3": "*",
+        "rxjs-fs": "*"
+    }
 }
