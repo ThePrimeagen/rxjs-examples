@@ -5,8 +5,19 @@ var mkpath = require('mkpath');
 var _ = require('lodash');
 var Rx = require('rx');
 var rxjs_fs = require('rxjs-fs');
-function browserifyObs(options, b) {
+
+var REQUIRED_PATH = 'examples/observables';
+
+function browserifyObs(srcPath, externals, options) {
     return Rx.Observable.create(function(observer) {
+
+        var b = browserify()
+            .add(srcPath);
+
+        // Adds the externals
+        browserifyExternals(b, externals);
+        excludeExternals(b, externals);
+
         b.bundle(options, function(err, src) {
             if (err) {
                 observer.onError();
@@ -83,39 +94,39 @@ module.exports = {
         var htmlPath = path.join(out, 'index.html');
         var srcHtml = path.join(srcPath, 'index.html');
 
-        var bundleObs = mkPathObs(out)
-            .select(function() {
-                var b = browserify()
-                    .add(srcPath);
+        // Having troubles if required path is not constructed first.
+        var makeObs = mkPathObs(REQUIRED_PATH)
+            .selectMany(function() {
+                return mkPathObs(out);
+            });
 
-                // Adds the externals
-                browserifyExternals(b, externals);
-                excludeExternals(b, externals);
-
-                return b;
-            })
-            .selectMany(function(b) {
-                return browserifyObs({debug: debug}, b);
+        var bundleObs = makeObs
+            .selectMany(function() {
+                return browserifyObs(srcPath, externals, {debug: debug});
             })
             .selectMany(function(src) {
                 return fsWriteFile(bundlePath, src);
             });
 
-        var buildHtmlObs = fsExistsObs(srcHtml)
+        var buildHtmlObs = makeObs
+            .selectMany(function() {
+                return fsExistsObs(srcHtml);
+            })
             .selectMany(function(exists) {
                 if (exists) {
                     return getHTMLObs(srcHtml);
                 }
                 return getEmptyHTML();
-            })
-            .selectMany(function(html) {
-                return fsWriteFile(htmlPath, html);
             });
 
-        Rx.Observable.zip(buildHtmlObs, bundleObs, function() {})
-            .subscribe(function() {
-                var i = 0;
-            });
+
+        Rx.Observable.zip(buildHtmlObs, bundleObs, function(html) {
+            return html;
+        }).selectMany(function(html) {
+            return fsWriteFile(htmlPath, html);
+        }).subscribe(function() {
+            console.log('Finished compilation');
+        });
         // b.bundle({debug: debug}, function(err, src) {
         //     if (!err) {
         //         mkpath(out, function(err) {
