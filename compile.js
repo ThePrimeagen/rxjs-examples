@@ -183,8 +183,8 @@ module.exports = {
 // TODO: Create this into something read from manifest.json
 function browserifyExternals(b, externals) {
     b.require(externals + 'jquery.js', {expose: 'jquery'});
+    b.require(externals + 'rx.js', {expose: 'rx'});
     b.require(externals + 'rx.binding.js', {expose: 'rxjs-bindings'});
-    b.require('rx', {expose: 'rx'});
     b.require('ix', {expose: 'ix'});
     b.require('d3', {expose: 'd3'});
     b.require('lodash', {expose: 'lodash'});
@@ -196,9 +196,9 @@ function browserifyExternals(b, externals) {
  */
 function excludeExternals(b, externals) {
     b.external(externals + 'jquery.js');
-    b.external('rx');
+    b.external(externals + 'rx.js');
+    b.external(externals + 'rx.binding.js');
     b.external('ix');
-    b.external('rxjs-bindings');
     b.external('lodash');
     b.external('d3');
     b.external('lodash');
