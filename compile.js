@@ -16,7 +16,10 @@ function browserifyObs(srcPath, externals, options) {
 
         // Adds the externals
         browserifyExternals(b, externals);
-        excludeExternals(b, externals);
+
+        if (options.excludeExternals) {
+            excludeExternals(b, externals);
+        }
 
         b.bundle(options, function(err, src) {
             if (err) {
@@ -102,7 +105,8 @@ module.exports = {
 
         var bundleObs = makeObs
             .selectMany(function() {
-                return browserifyObs(srcPath, externals, {debug: debug});
+                return browserifyObs(srcPath, externals, 
+                    {debug: debug, excludeExternals: true});
             })
             .selectMany(function(src) {
                 return fsWriteFile(bundlePath, src);
@@ -127,49 +131,6 @@ module.exports = {
         }).subscribe(function() {
             console.log('Finished compilation');
         });
-        // b.bundle({debug: debug}, function(err, src) {
-        //     if (!err) {
-        //         mkpath(out, function(err) {
-        //             if (!err) {
-        //                 var bundlePath = path.join(out, 'bundle.js');
-        //                 var htmlPath = path.join(out, 'index.html');
-        //                 var srcHtml = path.join(srcPath, 'index.html');
-
-        //                 console.log("Writing Bundle: " + bundlePath + " : Html to: " + htmlPath);
-        //                 fs.writeFile(bundlePath, src, function(err) {
-        //                     if (err) {
-        //                         console.log('Error JS(' + srcPath + '): ' + err);
-        //                     }
-        //                 });
-
-        //                 fs.exists(srcHtml, function(exists) {
-
-        //                     if (exists) {
-
-        //                         fs.readFile(srcHtml, function(err, html) {
-        //                             if (err) {
-        //                                 console.log('Could not read source html: ' + srcHtml);
-        //                             } else {
-        //                                 fs.writeFile(htmlPath, getHtml(html.toString()), function(err) {
-
-        //                                     if (err) {
-        //                                         console.log('Error HTML(' + srcPath + '): ' + err);
-        //                                     }
-        //                                 });
-        //                             }
-        //                         });
-        //                     } else {
-        //                         fs.writeFile(htmlPath, getHtml(), function(err) {
-        //                             if (err) {
-        //                                 console.log('Error HTML(' + srcPath + '): ' + err);
-        //                             }
-        //                         });
-        //                     }
-        //                 });
-        //             }
-        //         });
-        //     }
-        // });
     },
     /**
      * Builds the core compilation process.  This is where
@@ -185,28 +146,17 @@ module.exports = {
 
         var bundlePath = path.join(out, 'core.js');
 
-        // Adds the externals
-        browserifyExternals(b, externals);
+        var obs = browserifyObs(externals + 'index.js', externals, {
+            debug: debug
+        });
+        var mkPObs = mkPathObs(out)
+            .selectMany(obs)
+            .selectMany(function(src) {
+                return fsWriteFile(bundlePath, src);
+            });
 
-        b.bundle({debug: debug}, function(err, src) {
-            if (err) {
-                console.log("Error compiling core");
-            } else {
-
-                mkpath(out, function(err) {
-                    if (err) {
-                        console.log("Could not create path for bundles");
-                    } else {
-
-                        console.log("Writing Core: " + bundlePath);
-                        fs.writeFile(bundlePath, src, function(err) {
-                            if (err) {
-                                console.log('Error JS(core): ' + err);
-                            }
-                        });
-                    }
-                });
-            }
+        mkPObs.subscribe(function() {
+            console.log('Core compiled: ' + bundlePath);
         });
     },
     /**
@@ -217,24 +167,25 @@ module.exports = {
         var linkTemplate = '<li><a href="<%= href %>"><%= displayName %></a></li>';
         var links = '';
         for (var k in modules) {
+            console.log('Module: ' + k);
             links += _.template(linkTemplate, {
                 href: modules[k],
                 displayName: k
             });
         }
-        fs.writeFile(exampleDir + 'index.html', _.template(getHtmlExamplePage(), {links: links}), function(err) {
-            if (err) {
-                console.log('Error HTML(' + exampleDir + 'index.html): ' + err);
-            }
-        });
+        fsWriteFile(
+            exampleDir + 'index.html', 
+            _.template(getHtmlExamplePage(), {links: links})
+        ).subscribe();
     }
 }
 
 // TODO: Create this into something read from manifest.json
 function browserifyExternals(b, externals) {
     b.require(externals + 'jquery.js', {expose: 'jquery'});
-    b.require(externals + 'rx.js', {expose: 'rx'});
     b.require(externals + 'rx.binding.js', {expose: 'rxjs-bindings'});
+    b.require('rx', {expose: 'rx'});
+    b.require('ix', {expose: 'ix'});
     b.require('d3', {expose: 'd3'});
     b.require('lodash', {expose: 'lodash'});
 }
@@ -245,8 +196,10 @@ function browserifyExternals(b, externals) {
  */
 function excludeExternals(b, externals) {
     b.external(externals + 'jquery.js');
-    b.external(externals + 'rx.js');
-    b.external(externals + 'rx.binding.js');
+    b.external('rx');
+    b.external('ix');
+    b.external('rxjs-bindings');
+    b.external('lodash');
     b.external('d3');
     b.external('lodash');
 }

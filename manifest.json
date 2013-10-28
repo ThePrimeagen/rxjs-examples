@@ -1,6 +1,7 @@
 {
     "modules": {
         "Intro into Observables": "./observables/intro/",
+        "Intro into Enumerables": "./enumerables/intro/",
         "Rx.Observable.publish": "./observables/publish/",
         "Rx.Observable.takeUntil": "./observables/takeUntil/",
         "Rx.Observable.zip": "./observables/zip/"
