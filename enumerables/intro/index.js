@@ -1,9 +1,10 @@
 var $ = require('jquery');
 var Rx = require('rx');
+var Ix = require('ix');
 
 $(function() {
 
-    var en = Rx.Enumerable.create(function() {
+    var en = Ix.Enumerable.create(function() {
         return Math.floor(Math.random() * 100);
     }).filter(function(val) {
         return val > 0.5;
