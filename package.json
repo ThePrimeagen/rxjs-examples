@@ -3,7 +3,7 @@
     "author": [
         "Michael Paulson <michael.b.paulson@gmail.com>"
     ],
-    "version": "0.1.0",
+    "version": "0.1.1",
     "description": "Hopefully a useful rxjs-example set.",
     "dependencies": {
         "rxjs-jquery": "*",
